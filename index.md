@@ -28,6 +28,13 @@ Syntax highlighted code block
 
 For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
 
+### References
+[Raspberry Pi Dramble](https://www.pidramble.com/)
+[CNCF Presentations](https://github.com/cncf/presentations/tree/master/kubernetes)
+[Quarkus](https://quarkus.io/)
+[kubernetes Documentation](https://kubernetes.io/docs/home/)
+[OpenHab](https://www.openhab.org/)
+
 ### Jekyll Themes
 
 Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/pramalin/quarkus-raspberry-pi/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
