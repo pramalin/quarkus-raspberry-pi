@@ -29,11 +29,12 @@ Syntax highlighted code block
 For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
 
 ### References
-[Raspberry Pi Dramble](https://www.pidramble.com/)
-[CNCF Presentations](https://github.com/cncf/presentations/tree/master/kubernetes)
-[Quarkus](https://quarkus.io/)
-[kubernetes Documentation](https://kubernetes.io/docs/home/)
-[OpenHab](https://www.openhab.org/)
+- [Raspberry Pi Dramble](https://www.pidramble.com/)
+- [CNCF Presentations](https://github.com/cncf/presentations/tree/master/kubernetes)
+- [Quarkus](https://quarkus.io/)
+- [kubernetes Documentation](https://kubernetes.io/docs/home/)
+- [OpenHab](https://www.openhab.org/)
+- [Janakiram](https://www.youtube.com/user/janakirammsv)
 
 ### Jekyll Themes
 
