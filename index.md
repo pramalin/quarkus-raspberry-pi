@@ -46,7 +46,7 @@ Quarkus support native compilation using GraalVM. However GraalVM is available f
 #### Networking
 We have used the following IP address for the nodes.
 
-  | **host name** | **IP address** |
+  | **nodes** | **IP address** |
   |-----------|------------|
   | master0   | 10.0.1.60  |
   | worker1   | 10.0.1.61  |
@@ -76,10 +76,57 @@ Side note:
 #### Single Node setup
 Single node ready to run VM instances are available for Kubernetes as [minikube](https://kubernetes.io/docs/setup/learning-environment/minikube/) and for OpenShift as [minishift](https://github.com/minishift/minishift).  Which are useful to explore these platforms. 
 
-#### Quarkus
+### Quarkus
 [Quarkus](https://quarkus.io/) is a comprehensive Java framework that compiles Java code into container applications suitable for 'Function as a Service' modules to start up quickly and use less resources.
 
-By default the container images created by the build tools are for standard JVM
+#### Quick start
+[Link](https://quarkus.io/guides/getting-started-guide)
+**Prerequsites**
+1. JDK 1.8+ installed with JAVA_HOME configured appropriately
+2. Apache Maven 3.5.3+
+
+**Bootstrapping the project**
+```sh
+mvn io.quarkus:quarkus-maven-plugin:0.18.0:create \
+    -DprojectGroupId=org.acme \
+    -DprojectArtifactId=getting-started \
+    -DclassName="org.acme.quickstart.GreetingResource" \
+    -Dpath="/hello"
+```
+
+It generates:
+- the Maven structure
+- an org.acme.quickstart.GreetingResource resource exposed on /hello
+- an associated unit test
+- a landing page that is accessible on http://localhost:8080 after starting the application
+- example Dockerfile files for both native and jvm modes
+- the application configuration file
+
+__skipping local testing__
+
+#### Building docker image  
+[Link](https://quarkus.io/guides/building-native-image-guide.html)
+```
+docker build -f src/main/docker/Dockerfile.jvm -t quarkus-quickstart/getting-started .
+```
+Running locally.
+```
+docker run -i --rm -p 8080:8080 quarkus-quickstart/getting-started
+```
+
+#### Deploying to Kubernetes  
+[Link](https://quarkus.io/guides/kubernetes-guide.html)
+
+**Prerequisites**
+1. having access to a Kubernetes and/or OpenShift cluster. Minikube and Minishift are valid options.
+2. being able to package the docker image from the native application guide
+
+
+
+#### Deploying to Raspberry Pi
+By default the container images created by the build system use the JDK for AMD processors as seen in the generated file: src/main/docker/Dockerfile.jvm
+This works for typical VMs on most of the developers machines.
+
 ```dockerfile
 ####
 # This Dockerfile is used in order to build a container that runs the Quarkus application in JVM mode
@@ -104,6 +151,29 @@ COPY target/lib/* /deployments/lib/
 COPY target/*-runner.jar /deployments/app.jar
 ENTRYPOINT [ "/deployments/run-java.sh" ]
 ```
+
+We need to modify the file slightly as shown below.
+
+```dockerfile
+FROM hypriot/rpi-java
+ENV JAVA_OPTIONS="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
+ENV AB_ENABLED=jmx_exporter
+RUN mkdir -p /deployments/lib
+COPY run-java.sh /deployments
+COPY target/lib/* /deployments/lib/
+COPY target/*-runner.jar /deployments/app.jar
+ENTRYPOINT [ "/deployments/run-java.sh" ]
+```
+
+There are two changes to the Dockerfile.jvm
+1. use Raspberry Pi JDK image 'hypriot/rpi-java'.
+2. copy the file run-java.sh which is not available in this image. 
+
+The [run-java.sh](./docs/run-java.sh) is extracted from the fabric8/java-alpine-openjdk8-jre image. We need to copy this file to the project directory where pom.xml is found. 
+
+After changing the Dockerfile and copying the run-java.sh, the build command generates the docker image that can successfully run in Raspberry Pi.
+
+
 ### References
 - [Raspberry Pi Dramble](https://www.pidramble.com/)
 - [CNCF Presentations](https://github.com/cncf/presentations/tree/master/kubernetes)
