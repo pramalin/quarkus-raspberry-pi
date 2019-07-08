@@ -14,18 +14,18 @@
    * [References](#references)
 
 ### Introduction
-[Quarkus](https://quarkus.io/) is a new framework aims to simplify developing Java applications for container platforms (Docker, Kubernetes, OpenShift, etc). Tools like ['Source to Image'](https://developers.redhat.com/blog/2017/02/23/getting-started-with-openshift-java-s2i/) are already available for this purpose, as seen in this this example: [Deploy a Spring Boot Application to OpenShift](https://www.baeldung.com/spring-boot-deploy-openshift). Quarkus features fast boot time and small memory usage, making it better framework to develop Java applications for 'Function as a Service' architecture where the functions are instantiated on demand, unlike long running applications that may tollerate slow start up.
+[Quarkus](https://quarkus.io/) is a new framework aims to simplify developing Java applications for container platforms (Docker, Kubernetes, OpenShift, etc). Tools like ['Source to Image'](https://developers.redhat.com/blog/2017/02/23/getting-started-with-openshift-java-s2i/) are already available for this purpose, as seen in this this example: [Deploy a Spring Boot Application to OpenShift](https://www.baeldung.com/spring-boot-deploy-openshift). Quarkus features fast boot time and small memory usage, making it better framework to develop Java applications for 'Function as a Service' architecture where the functions are instantiated on demand, unlike long running applications that may tolerate slow start up.
 
 #### Objective
-This page documents the instructions followed when setting up Rapberry Pi cluster for Kubernetes and running Quarkus examples. Overall the hardware set up is based on [Raspberry Pi Dramble](https://www.pidramble.com/) and Kubernetes set up is based on [k3s on Raspberry Pi](https://blog.alexellis.io/test-drive-k3s-on-raspberry-pi/). Please use them for detailed instructions.
+This page documents the instructions followed when setting up Raspberry Pi cluster for Kubernetes and running Quarkus examples. Overall the hardware set up is based on [Raspberry Pi Dramble](https://www.pidramble.com/) and Kubernetes set up is based on [k3s on Raspberry Pi](https://blog.alexellis.io/test-drive-k3s-on-raspberry-pi/). Please use them for detailed instructions.
 
 ### Why Raspberry Pi?
-All major cloud system providers support Kubernetes and there are single node Kubernetes VM images suitable to run on developers workstation. However setting Kubernetes up on bare metal servers provides better insight into the operation of multi-node cluster system. Raspberry Pi Single Board Computers are less expensive and acluster with one master node and 3 worker nodes can be setup spending less than 300 US dollers. The book [Kubernetes: Up and Running](https://www.amazon.com/_/dp/1491935677?tag=oreilly20-20) also recomends setting up Raspberry Pi cluster.
+All major cloud system providers support Kubernetes and there are single node Kubernetes VM images suitable to run on developers workstation. However setting Kubernetes up on bare metal servers provides better insight into the operation of multi-node cluster system. Raspberry Pi Single Board Computers are less expensive and a four-node cluster setup with them costs about $300. The book [Kubernetes: Up and Running](https://www.amazon.com/_/dp/1491935677?tag=oreilly20-20) also recommends setting up Raspberry Pi cluster.
 
-Raspberry Pis from model 3 onwards use 64 ARM processors but still use 32 bit Linux for backward compatibility with older models. When its hardware becomes a limiting factor for their needs, many developers use stack of Intel's [NUC](https://www.amazon.com/dp/B07QH8CG9L/ref=sspa_dk_detail_0?psc=1) or similar hardware.
+Raspberry Pi from model 3 onwards use 64 ARM processors but still use 32 bit Linux for backward compatibility with older models. This can be a limiting factor in some environments. However the same instructions documented here can be adapted for more powerful machines like Intel's [NUC](https://www.amazon.com/dp/B07QH8CG9L/ref=sspa_dk_detail_0?psc=1).
 
 ### Hardware
- - Rabpberry Pi - 4
+ - Raspberry Pi - 4
  - Micro SD card - 4 
  - 6 inch Ethernet cable - 4
  
@@ -65,7 +65,7 @@ Since we need to login to the individual nodes for administration, it is necessa
   | worker3   | 10.0.1.63  |
 
 
-It is easy to share Wifi Internet connection to the wired Ethernet in Ubuntu [Instructions](https://askubuntu.com/questions/3063/share-wireless-connection-with-wired-ethernet-port).
+It is easy to share wireless Internet connection to the wired Ethernet in Ubuntu [Instructions](https://askubuntu.com/questions/3063/share-wireless-connection-with-wired-ethernet-port).
 
 
 However the default address range (10.42.0.x) of the shared network did not match the static IP addresses selected for the nodes. To change the IP range we need to do the following. Further details are [here](https://askubuntu.com/questions/1062617/cannot-change-address-range-10-42-0-x-in-shared-to-other-computer-method).
@@ -80,7 +80,7 @@ We'll use [k3s](https://k3s.io/), a lightweight distribution of Kubernetes targe
 - **References**
     - General Kubernetes [documentation](https://kubernetes.io/docs/home/) is the good place to start learning the concepts. 
     
-    - [Goole Kubernetes Engine](https://cloud.google.com/kubernetes-engine/docs/) is Goole's implementation of Kubernetes on cloud. Their implementation and the Web interface to manage Kubernetes is considered to be the most polished. The documentation has several tutorials for Java examples and offers free credit to test drive their platform.
+    - [Google Kubernetes Engine](https://cloud.google.com/kubernetes-engine/docs/) is Google's implementation of Kubernetes on cloud. Their implementation and the Web interface to manage Kubernetes is considered to be the most polished. The documentation has several tutorials for Java examples and offers free credit to test drive their platform.
     
     - [OpenShift](https://learn.openshift.com/) is a Platform as a Service offering from Red Hat, built on top of Kubernetes. This implementation also offers very good Web UI and used by many businesses to implement on-premises Container infrastructure.
 
@@ -94,12 +94,55 @@ Kubernetes is a command line driven system. The cloud system providers like Goog
 **Installation instructions**
 [Link](https://mindmelt.nl/mindmelt.nl/2019/04/08/k3s-kubernetes-dashboard-load-balancer/)
 
-- ##In master##
-   - download yaml
+- **In master**
+   - setup access control
+[Creating Sample user](https://github.com/kubernetes/dashboard/wiki/Creating-sample-user)
+
+**Create yaml files**
+
+file: dashboard-adminuser.yaml
+```yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: admin-user
+  namespace: kube-system
+```
+file: adminuser-rbac.yaml
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: admin-user
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: admin-user
+  namespace: kube-system
+```
+
+**Apply yaml files**
+```sh
+kubectl apply -f dashboard-adminuser.yaml
+kubectl apply -f adminuser-rbac.yaml
+```
+**Install dashboard**
+   - download dashboard yaml
 ```sh
 curl -sfL https://raw.githubusercontent.com/kubernetes/dashboard/v1.10.1/src/deploy/recommended/kubernetes-dashboard.yaml > kubernetes-dashboard.yaml
 ```
-  - edit yaml to use ARM version and copy to <K3s>/manifests in master
+  - edit yaml to use ARM version
+
+  - copy to <K3s>/manifests in master
+'''sh
+$ sudo cp kubernetes-dashboard.yaml /var/lib/rancher/k3s/server/manifests/
+
+'''
+
+**Access dashboard via tunnel to proxy**
   -  run kubectl proxy
 ```sh
 $ kubectl proxy
@@ -121,23 +164,25 @@ ca.crt:     1062 bytes
 namespace:  11 bytes
 token:      eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJhZG1pbi11c2VyLXRva2VuLXRtdGx6Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImFkbWluLXVzZXIiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiI3MWFmOTE1Yi05OWUzLTExZTktYjdlMy1iODI3ZWJhZjEyOWUiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZS1zeXN0ZW06YWRtaW4tdXNlciJ9.XCaJ8lrvxqAoEJ21yuk_538DHrMaDrigfQjVQ3ttIzdymmknf_9PaCkLNmHdqL4kIbuDMI1ts8ayeQZy5M426K0Tn3fbcbcLbqzQ7VP4zhNoOUlnD41STIlcedHcwOBQCSrP5s_AXwR4hpij9HkaLxlJ-JymhxZlmOHhzpmjHZ2551hJeBaBkfVhaDOZnRjUCzs3rTnMsjSdcYGtpBgom1jgLaK49VpBgbTmyxu5FB5AWNTapn8nRpX9j3tAhQGjD9-YCmnjAIUtLXAz9albMtFcFqh9pEpSshbae1CznuO9TOUwucV5rJvbiDf0x_7pr3Wl7duCjsH7gVxJwNKL8g
 ```
-- ##in bastion##
+- **in bastion**
     - start ssh tunnel
 ```sh 
-    ssh -L8001:localhost:8001 pi@ <ip-adress of the master>
+    ssh -L8001:localhost:8001 pi@10.0.1.60
 ```
    - access dashboard
    http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/
+
+   - select Token and copy paste token
 
 
 #### Single Node setup
 Single node ready to run VM instances are available for Kubernetes as [minikube](https://kubernetes.io/docs/setup/learning-environment/minikube/) and for OpenShift as [minishift](https://github.com/minishift/minishift).  Which are useful to explore these platforms easily before trying to setup the cluster. 
 
 ### Function as a Service (FaaS)
-AWS Lambda populerized the FaaS model
+AWS Lambda popularized the FaaS model
 
 #### OpenFaas
-[OpenFaas](https://www.openfaas.com/) is a simple platform that can wrap functions written in many languages (Java, JavaScript, Python, Go, R, Shell script, Cobol, etc) into a Function as a Service modules and deploy to Kubernetes. It offers CLI tool to create, build and deploy the functions and simple Web UI to manage the deployed functions. There is a self-pased [workshop](https://github.com/openfaas/workshop) that can help us understand many practical uses of FaaS  architecture.
+[OpenFaas](https://www.openfaas.com/) is a simple platform that can wrap functions written in many languages (Java, JavaScript, Python, Go, R, Shell script, Cobol, etc.) into a Function as a Service modules and deploy to Kubernetes. It offers CLI tool to create, build and deploy the functions and simple Web UI to manage the deployed functions. There is a self-paced [workshop](https://github.com/openfaas/workshop) that can help us understand many practical uses of FaaS  architecture.
 
 ### Quarkus
 [Quarkus](https://quarkus.io/) is a comprehensive Java framework that compiles Java code into container applications suitable for 'Function as a Service' modules to start up quickly and use less resources.
@@ -277,3 +322,4 @@ After changing the Dockerfile and copying the run-java.sh, the build command gen
 - [Janakiram](https://www.youtube.com/user/janakirammsv)
 
 - [micronaut](https://micronaut.io/)
+
