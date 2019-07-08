@@ -77,20 +77,58 @@ sudo nmcli c modify 'Shared' ipv4.address 10.0.1.1/24
 #### Kubernetes
 We'll use [k3s](https://k3s.io/), a lightweight distribution of Kubernetes targeted for edge devices. This is stripped down version of the official distribution provided by [Rancher Labs](https://rancher.com/). It is interesting to note that there are several certified Kubernetes providers, Google, Amazon, Microsoft, IBM, Red hat, etc.
 
-**References**
-- General Kubernetes [documentation](https://kubernetes.io/docs/home/) is the good place to start learning the concepts. 
-
-- [Goole Kubernetes Engine](https://cloud.google.com/kubernetes-engine/docs/) is Goole's implementation of Kubernetes on cloud. Their implementation and the Web interface to manage Kubernetes is considered to be the most polished. The documentation has several tutorials for Java examples and offers free credit to test drive their platform.
-
-- [OpenShift](https://learn.openshift.com/) is a Platform as a Service offering from Red Hat, built on top of Kubernetes. This implementation also offers very good Web UI and used by many businesses to implement on-premises Container infrastructure.
+- **References**
+    - General Kubernetes [documentation](https://kubernetes.io/docs/home/) is the good place to start learning the concepts. 
+    
+    - [Goole Kubernetes Engine](https://cloud.google.com/kubernetes-engine/docs/) is Goole's implementation of Kubernetes on cloud. Their implementation and the Web interface to manage Kubernetes is considered to be the most polished. The documentation has several tutorials for Java examples and offers free credit to test drive their platform.
+    
+    - [OpenShift](https://learn.openshift.com/) is a Platform as a Service offering from Red Hat, built on top of Kubernetes. This implementation also offers very good Web UI and used by many businesses to implement on-premises Container infrastructure.
 
 
 #### Dashboards
 Kubernetes is a command line driven system. The cloud system providers like Google Clouds, AWS provide useful dashboards to manage kubernetes.
 
 
-
 [Kubernetes Dashboard](https://github.com/kubernetes/dashboard) can be installed in the Raspberry Pi cluster to serve as UI.
+
+**Installation instructions**
+[Link](https://mindmelt.nl/mindmelt.nl/2019/04/08/k3s-kubernetes-dashboard-load-balancer/)
+
+- ##In master##
+   - download yaml
+```sh
+curl -sfL https://raw.githubusercontent.com/kubernetes/dashboard/v1.10.1/src/deploy/recommended/kubernetes-dashboard.yaml > kubernetes-dashboard.yaml
+```
+  - edit yaml to use ARM version and copy to <K3s>/manifests in master
+  -  run kubectl proxy
+```sh
+$ kubectl proxy
+```
+- Get  admin token:
+```sh
+$ kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep admin-user | awk '{print $1}')
+Name:         admin-user-token-tmtlz
+Namespace:    kube-system
+Labels:       <none>
+Annotations:  kubernetes.io/service-account.name: admin-user
+              kubernetes.io/service-account.uid: 71af915b-99e3-11e9-b7e3-b827ebaf129e
+
+Type:  kubernetes.io/service-account-token
+
+Data
+====
+ca.crt:     1062 bytes
+namespace:  11 bytes
+token:      eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJhZG1pbi11c2VyLXRva2VuLXRtdGx6Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImFkbWluLXVzZXIiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiI3MWFmOTE1Yi05OWUzLTExZTktYjdlMy1iODI3ZWJhZjEyOWUiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZS1zeXN0ZW06YWRtaW4tdXNlciJ9.XCaJ8lrvxqAoEJ21yuk_538DHrMaDrigfQjVQ3ttIzdymmknf_9PaCkLNmHdqL4kIbuDMI1ts8ayeQZy5M426K0Tn3fbcbcLbqzQ7VP4zhNoOUlnD41STIlcedHcwOBQCSrP5s_AXwR4hpij9HkaLxlJ-JymhxZlmOHhzpmjHZ2551hJeBaBkfVhaDOZnRjUCzs3rTnMsjSdcYGtpBgom1jgLaK49VpBgbTmyxu5FB5AWNTapn8nRpX9j3tAhQGjD9-YCmnjAIUtLXAz9albMtFcFqh9pEpSshbae1CznuO9TOUwucV5rJvbiDf0x_7pr3Wl7duCjsH7gVxJwNKL8g
+```
+- ##in bastion##
+    - start ssh tunnel
+```sh 
+    ssh -L8001:localhost:8001 pi@ <ip-adress of the master>
+```
+   - access dashboard
+   http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/
+
 
 #### Single Node setup
 Single node ready to run VM instances are available for Kubernetes as [minikube](https://kubernetes.io/docs/setup/learning-environment/minikube/) and for OpenShift as [minishift](https://github.com/minishift/minishift).  Which are useful to explore these platforms easily before trying to setup the cluster. 
@@ -127,7 +165,7 @@ It generates:
 - example Dockerfile files for both native and jvm modes
 - the application configuration file
 
-**Running the sample program***
+**Running the sample program**
 ```sh
 $ ./mvnw compile quarkus:dev
 ```
@@ -152,8 +190,13 @@ Listening for transport dt_socket at address: 5005
 2019-07-07 17:30:15,546 INFO  [io.quarkus] (main) Quarkus 0.17.0 started in 11.381s. Listening on: http://[::]:8080
 2019-07-07 17:30:15,588 INFO  [io.quarkus] (main) Installed features: [cdi, resteasy]
 ```
-$ curl http://localhost:8080/hello
+**Test quarkus web app**
+```sh
+$ curl http://10.0.1.60:8080/hello
 hello
+$ curl http://10.0.1.60:8080/hello/greeting/jaxjug
+hello jaxjug
+```
 
 #### Building docker image  
 [Link](https://quarkus.io/guides/building-native-image-guide.html)
@@ -170,8 +213,7 @@ docker run -i --rm -p 8080:8080 quarkus-quickstart/getting-started
 
 **Prerequisites**
 1. having access to a Kubernetes and/or OpenShift cluster. Minikube and Minishift are valid options.
-2. being able to package the docker image from the native application guide
-
+2. being able to package the docker image
 
 
 #### Deploying to Raspberry Pi
@@ -233,3 +275,5 @@ After changing the Dockerfile and copying the run-java.sh, the build command gen
 - [kubernetes Documentation](https://kubernetes.io/docs/home/)
 - [OpenHab](https://www.openhab.org/)
 - [Janakiram](https://www.youtube.com/user/janakirammsv)
+
+- [micronaut](https://micronaut.io/)
