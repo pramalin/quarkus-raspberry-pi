@@ -11,6 +11,8 @@ Table of Contents
          * [Operating System](#operating-system)
       * [Networking](#networking)
       * [JDK](#jdk)
+         * [Maven](#maven)
+      * [Docker](#docker)
       * [GrallVM](#grallvm)
       * [Kubernetes](#kubernetes)
          * [Installing k3s](#installing-k3s)
@@ -25,10 +27,11 @@ Table of Contents
          * [Building docker image](#building-docker-image)
          * [Deploying to Kubernetes](#deploying-to-kubernetes)
          * [Deploying to Raspberry Pi](#deploying-to-raspberry-pi)
+            * [Push image to registry](#push-image-to-registry)
+            * [Deploying to cluster](#deploying-to-cluster)
+            * [kubectl commands examples](#kubectl-commands-examples)
+            * [Screenshots](#screenshots)
       * [Useful Links](#useful-links)
-
-
-Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
 ## Introduction
 [Quarkus](https://quarkus.io/) is a new framework that aims to simplify developing Java applications for container platforms (Docker, Kubernetes, OpenShift, etc). Tools like ['Source to Image'](https://developers.redhat.com/blog/2017/02/23/getting-started-with-openshift-java-s2i/) are already available for this purpose, as seen in this this example: [Deploy a Spring Boot Application to OpenShift](https://www.baeldung.com/spring-boot-deploy-openshift). However Quarkus features fast boot time and small memory usage, making it a better java framework for 'Function as a Service' architecture. Where the functions are instantiated on demand, so fast start up time is a desired feature.
@@ -116,6 +119,23 @@ Then install the standard JDK for ARM 32 (e.g. jdk-8u212-linux-arm32-vfp-hflt).
 ```sh
 $ sudo apt-get install oracle-java8-jdk
 ```
+### Maven
+Install new version of maven in master node, where we will compile our code.
+```sh
+$ wget https://www-us.apache.org/dist/maven/maven-3/3.6.1/binaries/apache-maven-3.6.1-bin.tar.gz
+$ tar zxvf apache-maven-3.6.1-bin.tar.gz
+```
+
+## Docker
+Docker is also need to be installed in all the nodes. Docker is to verify that the images created can run locally in master before deploying to the cluster. It is also required for the nodes to retrieve the images from repository. In this setup we need to login to docker hub in each node for the deployments to succeed.
+
+```sh
+$ curl -sfL https://get.docker.com -o  install-docker.sh
+$ ./install-docker.sh
+$ sudo docker login -u pramalin
+password:
+```
+
 ## GrallVM
 Quarkus support native compilation using GraalVM. However GraalVM distribution is not available for ARM processers yet.
 
@@ -279,12 +299,11 @@ $ kubectl proxy
 ```sh
 $ kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep admin-user | awk '{print $1}')
 
-
-Name:         admin-user-token-tmtlz
+Name:         admin-user-token-89ngz
 Namespace:    kube-system
 Labels:       <none>
 Annotations:  kubernetes.io/service-account.name: admin-user
-              kubernetes.io/service-account.uid: 71af915b-99e3-11e9-b7e3-b827ebaf129e
+              kubernetes.io/service-account.uid: 34564883-a1ab-11e9-a0f6-b827ebaf129e
 
 Type:  kubernetes.io/service-account-token
 
@@ -292,7 +311,9 @@ Data
 ====
 ca.crt:     1062 bytes
 namespace:  11 bytes
-token:      eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJhZG1pbi11c2VyLXRva2VuLXRtdGx6Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImFkbWluLXVzZXIiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiI3MWFmOTE1Yi05OWUzLTExZTktYjdlMy1iODI3ZWJhZjEyOWUiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZS1zeXN0ZW06YWRtaW4tdXNlciJ9.XCaJ8lrvxqAoEJ21yuk_538DHrMaDrigfQjVQ3ttIzdymmknf_9PaCkLNmHdqL4kIbuDMI1ts8ayeQZy5M426K0Tn3fbcbcLbqzQ7VP4zhNoOUlnD41STIlcedHcwOBQCSrP5s_AXwR4hpij9HkaLxlJ-JymhxZlmOHhzpmjHZ2551hJeBaBkfVhaDOZnRjUCzs3rTnMsjSdcYGtpBgom1jgLaK49VpBgbTmyxu5FB5AWNTapn8nRpX9j3tAhQGjD9-YCmnjAIUtLXAz9albMtFcFqh9pEpSshbae1CznuO9TOUwucV5rJvbiDf0x_7pr3Wl7duCjsH7gVxJwNKL8g
+token:      eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJhZG1pbi11c2VyLXRva2VuLTg5bmd6Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImFkbWluLXVzZXIiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiIzNDU2NDg4My1hMWFiLTExZTktYTBmNi1iODI3ZWJhZjEyOWUiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZS1zeXN0ZW06YWRtaW4tdXNlciJ9.hXGdcBHX4chqnbpiMXQ88062a1lTQwa-dsgsWyLUY7Vgqw_-I5AMdU-V95zBCw3BruvuA8n9JP5S7YTI051sB2dOdzLQuOKtnOajnu21UyPeO3k78DInkjyneinyOhFYlRCPIFEPRR5aebcMUZK82eT4ou0VgWbXOZEfojrvKEDki_uJXDurnc6KLoabdp8P_EoPUTFGF4kax6zQrRytuIhJVj2jTOTQpPM2FEiE_QYWmoivGdjjpIlAuH-XqUSKdp6LeTVdX7Fg_o66flkDeKzJrvPZSp-44VhBHVMYNy2ennOEFQ2hjlVcj-XgCBHk8BSJyGNTFY_cKZCQQ1PDlw
+
+
 ```
 ### Dashboard Web access
 
@@ -302,17 +323,17 @@ token:      eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2V
 ```sh 
     ssh -L8001:localhost:8001 pi@10.0.1.60
 ```
-- access dashboard
+- access [dashboard](http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/)
 
 >   http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/
 
 - select Token option and copy paste the token of _admin-user-tonen-xxxx_
 
 ## Single Node setup
-Single node ready to run VM instances are available for Kubernetes as [minikube](https://kubernetes.io/docs/setup/learning-environment/minikube/) and for OpenShift as [minishift](https://github.com/minishift/minishift).  Which are useful to explore these platforms easily before trying to setup the cluster. 
+Single node ready to run VM instances are available for Kubernetes as [minikube](https://kubernetes.io/docs/setup/learning-environment/minikube/) and for OpenShift as [minishift](https://github.com/minishift/minishift).  Which are useful to explore these platforms easily without setting up a cluster. 
 
 ## Function as a Service (FaaS)
-AWS Lambda popularized the FaaS model
+[AWS Lambda] (https://aws.amazon.com/lambda/) popularized the FaaS model and the recent addition is [Google Cloud Functions](https://cloud.google.com/functions/).
 
 ### OpenFaas
 [OpenFaas](https://www.openfaas.com/) is a simple platform that can wrap functions written in many languages (Java, JavaScript, Python, Go, R, Shell script, Cobol, etc.) into a Function as a Service modules and deploy to Kubernetes. It offers CLI tool to create, build and deploy the functions and simple Web UI to manage the deployed functions. There is a self-paced [workshop](https://github.com/openfaas/workshop) that can help us understand many practical uses of FaaS  architecture.
@@ -331,13 +352,13 @@ AWS Lambda popularized the FaaS model
 $ mvn io.quarkus:quarkus-maven-plugin:0.18.0:create \
     -DprojectGroupId=org.acme \
     -DprojectArtifactId=getting-started \
-    -DclassName="org.acme.quickstart.GreetingResource" \
+    -DclassName="org.acme.getting-started.GreetingResource" \
     -Dpath="/hello"
 ```
 
 It generates:
 - the Maven structure
-- an org.acme.quickstart.GreetingResource resource exposed on /hello
+- an org.acme.getting-started.GreetingResource resource exposed on /hello
 - an associated unit test
 - a landing page that is accessible on http://localhost:8080 after starting the application
 - example Dockerfile files for both native and jvm modes
@@ -379,11 +400,11 @@ hello jaxjug
 ### Building docker image  
 [Link](https://quarkus.io/guides/building-native-image-guide.html)
 ```
-docker build -f src/main/docker/Dockerfile.jvm -t quarkus-quickstart/getting-started .
+docker build -f src/main/docker/Dockerfile.jvm -t quarkus-getting-started/getting-started .
 ```
 Running locally.
 ```
-docker run -i --rm -p 8080:8080 quarkus-quickstart/getting-started
+docker run -i --rm -p 8080:8080 quarkus-getting-started/getting-started
 ```
 
 ### Deploying to Kubernetes  
@@ -438,12 +459,56 @@ ENTRYPOINT [ "/deployments/run-java.sh" ]
 
 There are two changes to the Dockerfile.jvm
 1. use Raspberry Pi JDK image 'hypriot/rpi-java'.
-2. copy the file run-java.sh which is not available in this image. 
+2. copy the run-java.sh which is not available in this image. 
 
 The [run-java.sh](./docs/run-java.sh) file was extracted from the fabric8/java-alpine-openjdk8-jre image. We need to copy this file to the project directory where pom.xml is found. 
 
 After changing the Dockerfile and copying the run-java.sh, the build command generates the docker image that can successfully run in Raspberry Pi.
 
+#### Push image to registry
+First, we need to push the Docker image to the image registry of our Kubernetes cluster. Here we have used [docker hub](https://cloud.docker.com/repository/list). This is in some way similar to github where we mnage our source code.
+```sh
+docker push pramalin/getting-started
+```
+
+#### Deploying to cluster
+```sh
+$ sudo kubectl run quarkus-getting-started --image=pramalin/getting-started:latest --port=8080 --image-pull-policy=IfNotPresent
+deployment.apps/quarkus-getting-started created
+```
+Followed by
+```sh
+$ sudo kubectl expose deployment quarkus-getting-started --type=NodePort
+service/quarkus-getting-started exposed
+```
+The application is now exposed as an internal service.
+
+Find the assigned port
+```sh
+$ sudo kubectl get service
+NAME                      TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+kubernetes                ClusterIP   10.43.0.1       <none>        443/TCP          23h
+quarkus-getting-started   NodePort    10.43.146.128   <none>        8080:30966/TCP   4m16s
+```
+
+#### kubectl commands examples
+```sh
+sudo kubectl get deployment
+sudo kubectl delete deployment quarkus-quickstart
+sudo kubectl get service
+sudo kubectl delete service quarkus-quickstart
+sudo kubectl get pod
+sudo kubectl run quarkus-getting-started --image=pramalin/getting-started:latest --port=8080 --image-pull-policy=IfNotPresent
+sudo kubectl expose deployment quarkus-getting-started --type=NodePort
+sudo kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep admin-user | awk '{print $1}')
+sudo kubectl get service
+```
+
+#### Screenshots
+![Docker Hub](images/docker-hub.png)
+![Quarkus landing page](images/quarkus-landing.png)
+![Getting started service](images/getting-started.png)
+![Dashboard](images/dashboard.png)
 
 ## Useful Links
 - [Raspberry Pi Dramble](https://www.pidramble.com/)
