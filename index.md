@@ -158,7 +158,7 @@ Kubernetes is a command line driven system. The cloud system providers like Goog
 ***Installation instructions***
 [Link](https://mindmelt.nl/mindmelt.nl/2019/04/08/k3s-kubernetes-dashboard-load-balancer/)
 
-- ***In master***
+> The following procedures are applied in **master** node.
    - setup access control
 [Creating Sample user](https://github.com/kubernetes/dashboard/wiki/Creating-sample-user)
 
@@ -200,7 +200,7 @@ curl -sfL https://raw.githubusercontent.com/kubernetes/dashboard/v1.10.1/src/dep
 ```
 file: kubernetes-dashboard.yaml.orig
 ```yaml
-# ------------------- Dashboard Deployment ------------------- #
+\# ------------------- Dashboard Deployment ------------------- #
 
 kind: Deployment
 apiVersion: apps/v1
@@ -268,7 +268,7 @@ ca.crt:     1062 bytes
 namespace:  11 bytes
 token:      eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJhZG1pbi11c2VyLXRva2VuLXRtdGx6Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImFkbWluLXVzZXIiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiI3MWFmOTE1Yi05OWUzLTExZTktYjdlMy1iODI3ZWJhZjEyOWUiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZS1zeXN0ZW06YWRtaW4tdXNlciJ9.XCaJ8lrvxqAoEJ21yuk_538DHrMaDrigfQjVQ3ttIzdymmknf_9PaCkLNmHdqL4kIbuDMI1ts8ayeQZy5M426K0Tn3fbcbcLbqzQ7VP4zhNoOUlnD41STIlcedHcwOBQCSrP5s_AXwR4hpij9HkaLxlJ-JymhxZlmOHhzpmjHZ2551hJeBaBkfVhaDOZnRjUCzs3rTnMsjSdcYGtpBgom1jgLaK49VpBgbTmyxu5FB5AWNTapn8nRpX9j3tAhQGjD9-YCmnjAIUtLXAz9albMtFcFqh9pEpSshbae1CznuO9TOUwucV5rJvbiDf0x_7pr3Wl7duCjsH7gVxJwNKL8g
 ```
-- ***in bastion***
+> The following procedure are for **bastion** station.
     - start ssh tunnel
 ```sh 
     ssh -L8001:localhost:8001 pi@10.0.1.60
