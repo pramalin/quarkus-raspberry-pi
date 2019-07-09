@@ -1,5 +1,3 @@
-## Quarkus on Raspberry PI nodes
-
 * [Quarkus on Raspberry PI nodes](#quarkus-on-raspberry-pi-nodes)
    * [Introduction](#introduction)
    * [Hardware](#hardware)
@@ -11,13 +9,13 @@
       * [Quarkus](#quarkus)
       * [Examples](#examples)
    * [Other Cluster setups](#other-cluster-setups)
-   * [References](#references)
+   * [Links](#links)
 
 ### Introduction
-[Quarkus](https://quarkus.io/) is a new framework aims to simplify developing Java applications for container platforms (Docker, Kubernetes, OpenShift, etc). Tools like ['Source to Image'](https://developers.redhat.com/blog/2017/02/23/getting-started-with-openshift-java-s2i/) are already available for this purpose, as seen in this this example: [Deploy a Spring Boot Application to OpenShift](https://www.baeldung.com/spring-boot-deploy-openshift). Quarkus features fast boot time and small memory usage, making it better framework to develop Java applications for 'Function as a Service' architecture where the functions are instantiated on demand, unlike long running applications that may tolerate slow start up.
+[Quarkus](https://quarkus.io/) is a new framework that aims to simplify developing Java applications for container platforms (Docker, Kubernetes, OpenShift, etc). Tools like ['Source to Image'](https://developers.redhat.com/blog/2017/02/23/getting-started-with-openshift-java-s2i/) are already available for this purpose, as seen in this this example: [Deploy a Spring Boot Application to OpenShift](https://www.baeldung.com/spring-boot-deploy-openshift). However Quarkus features fast boot time and small memory usage, making it a better java framework for 'Function as a Service' architecture. Where the functions are instantiated on demand, so fast start up time is a desired feature.
 
 #### Objective
-This page documents the instructions followed when setting up Raspberry Pi cluster for Kubernetes and running Quarkus examples. Overall the hardware set up is based on [Raspberry Pi Dramble](https://www.pidramble.com/) and Kubernetes set up is based on [k3s on Raspberry Pi](https://blog.alexellis.io/test-drive-k3s-on-raspberry-pi/). Please use them for detailed instructions.
+This page documents the instructions followed when setting up Raspberry Pi cluster for Kubernetes and running Quarkus examples. The hardware set up and the Operating System installations are based on [Raspberry Pi Dramble](https://www.pidramble.com/). Please reffer this site for detailed instructions. We picked [k3s](https://k3s.io/), a lightweight Kubernetes distribution, suitable for machines with small memory capacity. 
 
 ### Why Raspberry Pi?
 All major cloud system providers support Kubernetes and there are single node Kubernetes VM images suitable to run on developers workstation. However setting Kubernetes up on bare metal servers provides better insight into the operation of multi-node cluster system. Raspberry Pi Single Board Computers are less expensive and a four-node cluster setup with them costs about $300. The book [Kubernetes: Up and Running](https://www.amazon.com/_/dp/1491935677?tag=oreilly20-20) also recommends setting up Raspberry Pi cluster.
@@ -30,29 +28,29 @@ Raspberry Pi from model 3 onwards use 64 ARM processors but still use 32 bit Lin
  - 6 inch Ethernet cable - 4
  
 ### Power Supply
-__Option 1__
+**Option 1**
 - USB Power Source
   - USB Power Hub - 1
   - USB to Micro USB cable - 4
   - 4 port Ethernet Switch - 1
 
-__Option 2__
-- Power Over Ethernet (Option 2)
+**Option 2**
+- Power Over Ethernet
+  - POE HAT - 4
   - 4 port POE Ethernet Switch - 1
 
 ### Software
 
 #### Operating System
-It is sufficient to use the standard raspbian (32 bit) Linux distribution to run the JVM version of the container images.
-
-#### JDK
- We just need to install the standard JDK for ARM 32 (e.g. jdk-8u212-linux-arm32-vfp-hflt).
-
-#### GrallVM
-Quarkus support native compilation using GraalVM. However GraalVM distribution is not available for ARM processers yet.
-
+It is sufficient to use the standard Raspbian (32 bit) Linux distribution to run the JVM version of the container images.
+- Flash the OS to SD card
+Follow the [official instructions](https://www.raspberrypi.org/documentation/installation/installing-images/README.md) to install Raspbian lite version. 
+- enable ssh
+Mount the SD card and create a blank file sudo touch /Volumes/boot/ssh
 
 #### Networking
+Networking setup is the most difficult aspect of the cluster setup. Our requirement is to access each nodes in the cluster individually from the bastion and for each node to have internet access.
+
 Typically the local clusters are demonstrated using a dedicated router for the cluster which then connects to the ISP provided router. For simplicity sake, here we'll use the shared network set up on Ubuntu host, wired to the Ethernet switch of the cluster.
 
 Since we need to login to the individual nodes for administration, it is necessary to assign static IP address to each node. We have used the following IP address for the nodes.
@@ -64,19 +62,84 @@ Since we need to login to the individual nodes for administration, it is necessa
   | worker2   | 10.0.1.62  |
   | worker3   | 10.0.1.63  |
 
+For each board
+- connect via Ethernet port [Link](https://www.raspberrypi.org/magpi/ssh-remote-control-raspberry-pi/)
+- login default (user: pi, password: raspberry)
+- Edit file: /etc/dhcpcd.conf to set the IP address
+
+```sh
+interface eth0
+static ip_address=10.0.1.60/24
+static ip6_address=fd51:42f8:caae:d92e::ff/64
+static routers=10.0.1.1
+static domain_name_servers=8.8.8.8
+```
+- Set hostname in file: /etc/hostname (example)
+```sh
+master0
+```
+- Edit file : /etc/hosts to include
+```sh
+127.0.1.1       master0
+```
 
 It is easy to share wireless Internet connection to the wired Ethernet in Ubuntu [Instructions](https://askubuntu.com/questions/3063/share-wireless-connection-with-wired-ethernet-port).
-
 
 However the default address range (10.42.0.x) of the shared network did not match the static IP addresses selected for the nodes. To change the IP range we need to do the following. Further details are [here](https://askubuntu.com/questions/1062617/cannot-change-address-range-10-42-0-x-in-shared-to-other-computer-method).
 
 ```sh
 sudo nmcli c modify 'Shared' ipv4.address 10.0.1.1/24
 ```
+This setup will allow us to connect to the individual nodes by IP address and each node will have internet access.
 
-#### Kubernetes
+#### JDK
+Then install the standard JDK for ARM 32 (e.g. jdk-8u212-linux-arm32-vfp-hflt).
+```sh
+$ sudo apt-get install oracle-java8-jdk
+```
+#### GrallVM
+Quarkus support native compilation using GraalVM. However GraalVM distribution is not available for ARM processers yet.
+
+
+### Kubernetes
 We'll use [k3s](https://k3s.io/), a lightweight distribution of Kubernetes targeted for edge devices. This is stripped down version of the official distribution provided by [Rancher Labs](https://rancher.com/). It is interesting to note that there are several certified Kubernetes providers, Google, Amazon, Microsoft, IBM, Red hat, etc.
 
+#### Installing k3s
+On master node:
+- Download k3s install script and install k3s
+```sh
+$ curl -sfL https://get.k3s.io -o install-k3s.sh
+$ ./install-k3s.sh
+```
+- obtain K3S_TOKEN
+```sh
+$ sudo cat /var/lib/rancher/k3s/server/node-token
+K1067ab3d6b7def59628e00d8498481adfb796365b5b86949250bc5323ad173d040::node:da4b4dcc2bbc88b25f79c7549d93ce36
+```
+- create start and stop scripts
+file: start-k3s.sh 
+```sh
+sudo k3s server &
+```
+
+file: stop-k3s.sh 
+```sh
+sudo systemctl stop k3s
+```
+On worker nodes:
+- copy /usr/local/bin/k3s from master.
+- create start and stop scripts
+
+file: start-k3s-agent.sh 
+```sh 
+export K3S_URL="https://10.0.1.60:6443"
+export K3S_TOKEN=K1067ab3d6b7def59628e00d8498481adfb796365b5b86949250bc5323ad173d040::node:da4b4dcc2bbc88b25f79c7549d93ce36
+sudo k3s agent --server ${K3S_URL} --token ${K3S_TOKEN} &
+```
+file: stop-k3s.sh 
+```sh
+sudo systemctl stop k3s
+```
 - **References**
     - General Kubernetes [documentation](https://kubernetes.io/docs/home/) is the good place to start learning the concepts. 
     
@@ -126,8 +189,8 @@ subjects:
 
 **Apply yaml files**
 ```sh
-kubectl apply -f dashboard-adminuser.yaml
-kubectl apply -f adminuser-rbac.yaml
+$ kubectl apply -f dashboard-adminuser.yaml
+$ kubectl apply -f adminuser-rbac.yaml
 ```
 **Install dashboard**
    - download dashboard yaml
@@ -137,10 +200,10 @@ curl -sfL https://raw.githubusercontent.com/kubernetes/dashboard/v1.10.1/src/dep
   - edit yaml to use ARM version
 
   - copy to <K3s>/manifests in master
-'''sh
+```sh
 $ sudo cp kubernetes-dashboard.yaml /var/lib/rancher/k3s/server/manifests/
 
-'''
+```
 
 **Access dashboard via tunnel to proxy**
   -  run kubectl proxy
@@ -172,8 +235,7 @@ token:      eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2V
    - access dashboard
    http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/
 
-   - select Token and copy paste token
-
+   - select Token optio and copy paste the token from the section for admin-user-tonen-xxxx
 
 #### Single Node setup
 Single node ready to run VM instances are available for Kubernetes as [minikube](https://kubernetes.io/docs/setup/learning-environment/minikube/) and for OpenShift as [minishift](https://github.com/minishift/minishift).  Which are useful to explore these platforms easily before trying to setup the cluster. 
@@ -312,7 +374,7 @@ The [run-java.sh](./docs/run-java.sh) file was extracted from the fabric8/java-a
 After changing the Dockerfile and copying the run-java.sh, the build command generates the docker image that can successfully run in Raspberry Pi.
 
 
-### References
+### Links
 - [Raspberry Pi Dramble](https://www.pidramble.com/)
 - [CNCF Presentations](https://github.com/cncf/presentations/tree/master/kubernetes)
 - [k3s Lightweight Kubernetes](https://k3s.io/)
