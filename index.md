@@ -1,15 +1,31 @@
-* [Quarkus on Raspberry PI nodes](#quarkus-on-raspberry-pi-nodes)
-   * [Introduction](#introduction)
-   * [Hardware](#hardware)
-   * [Power Supply](#power-supply)
-   * [Software](#software)
-      * [Operating System](#operating-system)
-      * [Networking](#networking)
-      * [Kubernetes](#kubernetes)
-      * [Quarkus](#quarkus)
-      * [Examples](#examples)
-   * [Other Cluster setups](#other-cluster-setups)
-   * [Links](#links)
+Table of Contents
+=================
+
+         * [Introduction](#introduction)
+            * [Objective](#objective)
+         * [Why Raspberry Pi?](#why-raspberry-pi)
+         * [Hardware](#hardware)
+         * [Power Supply](#power-supply)
+         * [Software](#software)
+            * [Operating System](#operating-system)
+            * [Networking](#networking)
+            * [JDK](#jdk)
+            * [GrallVM](#grallvm)
+         * [Kubernetes](#kubernetes)
+            * [Installing k3s](#installing-k3s)
+      * [Dashboards](#dashboards)
+         * [Dashboard Web access](#dashboard-web-access)
+      * [Single Node setup](#single-node-setup)
+      * [Function as a Service (FaaS)](#function-as-a-service-faas)
+            * [OpenFaas](#openfaas)
+         * [Quarkus](#quarkus)
+            * [Quick start](#quick-start)
+            * [Building docker image](#building-docker-image)
+            * [Deploying to Kubernetes](#deploying-to-kubernetes)
+            * [Deploying to Raspberry Pi](#deploying-to-raspberry-pi)
+         * [Useful Links](#useful-links)
+
+Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
 ### Introduction
 [Quarkus](https://quarkus.io/) is a new framework that aims to simplify developing Java applications for container platforms (Docker, Kubernetes, OpenShift, etc). Tools like ['Source to Image'](https://developers.redhat.com/blog/2017/02/23/getting-started-with-openshift-java-s2i/) are already available for this purpose, as seen in this this example: [Deploy a Spring Boot Application to OpenShift](https://www.baeldung.com/spring-boot-deploy-openshift). However Quarkus features fast boot time and small memory usage, making it a better java framework for 'Function as a Service' architecture. Where the functions are instantiated on demand, so fast start up time is a desired feature.
@@ -284,7 +300,8 @@ token:      eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2V
     ssh -L8001:localhost:8001 pi@10.0.1.60
 ```
 - access dashboard
-   http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/
+
+>   http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/
 
 - select Token option and copy paste the token of _admin-user-tonen-xxxx_
 
