@@ -159,6 +159,7 @@ Kubernetes is a command line driven system. The cloud system providers like Goog
 [Link](https://mindmelt.nl/mindmelt.nl/2019/04/08/k3s-kubernetes-dashboard-load-balancer/)
 
 > The following procedures are applied in **master** node.
+
    - setup access control
 [Creating Sample user](https://github.com/kubernetes/dashboard/wiki/Creating-sample-user)
 
@@ -243,12 +244,13 @@ spec:
   - edit yaml to use ARM version
 
   - copy to K3S_LOCATION/manifests in master
+
 ```sh
 $ sudo cp kubernetes-dashboard.yaml /var/lib/rancher/k3s/server/manifests/
-
 ```
 
 ***Access dashboard via tunnel to proxy***
+
   -  run kubectl proxy
 ```sh
 $ kubectl proxy
