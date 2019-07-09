@@ -1,14 +1,14 @@
-Inhabited at some places, deserted at others, 
-depressed at some places, raised at others;
-wherever your (women and) men are good,
-Blessed land, you are good too.
+>Inhabited at some places, deserted at others, 
+>depressed at some places, raised at others;
+>wherever your (women and) men are good,
+>Blessed land, you are good too.
 
-நாடா கொன்றோ காடா கொன்றோ
-அவலா கொன்றோ மிசையா கொன்றோ
-எவ்வழி நல்லவ ராடவர்
-அவ்வழி நல்லை வாழிய நிலனே.
-Puranaanooru – 187
-[Old Tamil Poetry](https://oldtamilpoetry.com/2016/11/24/puranaanooru-187/)
+>நாடா கொன்றோ காடா கொன்றோ
+>அவலா கொன்றோ மிசையா கொன்றோ
+>எவ்வழி நல்லவ ராடவர்
+>அவ்வழி நல்லை வாழிய நிலனே.
+>Puranaanooru – 187
+>[Old Tamil Poetry](https://oldtamilpoetry.com/2016/11/24/puranaanooru-187/)
 
 Table of Contents
 =================
