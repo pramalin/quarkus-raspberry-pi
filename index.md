@@ -149,7 +149,7 @@ sudo systemctl stop k3s
     - [OpenShift](https://learn.openshift.com/) is a Platform as a Service offering from Red Hat, built on top of Kubernetes. This implementation also offers very good Web UI and used by many businesses to implement on-premises Container infrastructure.
 
 
-#### Dashboards
+## Dashboards
 Kubernetes is a command line driven system. The cloud system providers like Google Clouds, AWS provide useful dashboards to manage kubernetes.
 
 
@@ -275,6 +275,7 @@ ca.crt:     1062 bytes
 namespace:  11 bytes
 token:      eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJhZG1pbi11c2VyLXRva2VuLXRtdGx6Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImFkbWluLXVzZXIiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiI3MWFmOTE1Yi05OWUzLTExZTktYjdlMy1iODI3ZWJhZjEyOWUiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZS1zeXN0ZW06YWRtaW4tdXNlciJ9.XCaJ8lrvxqAoEJ21yuk_538DHrMaDrigfQjVQ3ttIzdymmknf_9PaCkLNmHdqL4kIbuDMI1ts8ayeQZy5M426K0Tn3fbcbcLbqzQ7VP4zhNoOUlnD41STIlcedHcwOBQCSrP5s_AXwR4hpij9HkaLxlJ-JymhxZlmOHhzpmjHZ2551hJeBaBkfVhaDOZnRjUCzs3rTnMsjSdcYGtpBgom1jgLaK49VpBgbTmyxu5FB5AWNTapn8nRpX9j3tAhQGjD9-YCmnjAIUtLXAz9albMtFcFqh9pEpSshbae1CznuO9TOUwucV5rJvbiDf0x_7pr3Wl7duCjsH7gVxJwNKL8g
 ```
+### Dashboard Web access
 
 > The following procedure are for **bastion** station.
 
@@ -287,16 +288,16 @@ token:      eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2V
 
    - select Token optio and copy paste the token from the section for admin-user-tonen-xxxx
 
-#### Single Node setup
+## Single Node setup
 Single node ready to run VM instances are available for Kubernetes as [minikube](https://kubernetes.io/docs/setup/learning-environment/minikube/) and for OpenShift as [minishift](https://github.com/minishift/minishift).  Which are useful to explore these platforms easily before trying to setup the cluster. 
 
-### Function as a Service (FaaS)
+## Function as a Service (FaaS)
 AWS Lambda popularized the FaaS model
 
 #### OpenFaas
 [OpenFaas](https://www.openfaas.com/) is a simple platform that can wrap functions written in many languages (Java, JavaScript, Python, Go, R, Shell script, Cobol, etc.) into a Function as a Service modules and deploy to Kubernetes. It offers CLI tool to create, build and deploy the functions and simple Web UI to manage the deployed functions. There is a self-paced [workshop](https://github.com/openfaas/workshop) that can help us understand many practical uses of FaaS  architecture.
 
-### Quarkus
+## Quarkus
 [Quarkus](https://quarkus.io/) is a comprehensive Java framework that compiles Java code into container applications suitable for 'Function as a Service' modules to start up quickly and use less resources.
 
 #### Quick start
