@@ -279,14 +279,14 @@ token:      eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2V
 
 > The following procedure are for **bastion** station.
 
-    - start ssh tunnel
+- start ssh tunnel
 ```sh 
     ssh -L8001:localhost:8001 pi@10.0.1.60
 ```
-   - access dashboard
+- access dashboard
    http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/
 
-   - select Token optio and copy paste the token from the section for admin-user-tonen-xxxx
+- select Token option and copy paste the token of _admin-user-tonen-xxxx_
 
 ## Single Node setup
 Single node ready to run VM instances are available for Kubernetes as [minikube](https://kubernetes.io/docs/setup/learning-environment/minikube/) and for OpenShift as [minishift](https://github.com/minishift/minishift).  Which are useful to explore these platforms easily before trying to setup the cluster. 
@@ -297,7 +297,7 @@ AWS Lambda popularized the FaaS model
 #### OpenFaas
 [OpenFaas](https://www.openfaas.com/) is a simple platform that can wrap functions written in many languages (Java, JavaScript, Python, Go, R, Shell script, Cobol, etc.) into a Function as a Service modules and deploy to Kubernetes. It offers CLI tool to create, build and deploy the functions and simple Web UI to manage the deployed functions. There is a self-paced [workshop](https://github.com/openfaas/workshop) that can help us understand many practical uses of FaaS  architecture.
 
-## Quarkus
+### Quarkus
 [Quarkus](https://quarkus.io/) is a comprehensive Java framework that compiles Java code into container applications suitable for 'Function as a Service' modules to start up quickly and use less resources.
 
 #### Quick start
@@ -425,8 +425,9 @@ The [run-java.sh](./docs/run-java.sh) file was extracted from the fabric8/java-a
 After changing the Dockerfile and copying the run-java.sh, the build command generates the docker image that can successfully run in Raspberry Pi.
 
 
-### Links
+### Useful Links
 - [Raspberry Pi Dramble](https://www.pidramble.com/)
+- [Will it cluster? k3s on your Raspberry Pi](https://blog.alexellis.io/test-drive-k3s-on-raspberry-pi/)
 - [CNCF Presentations](https://github.com/cncf/presentations/tree/master/kubernetes)
 - [k3s Lightweight Kubernetes](https://k3s.io/)
 - [Quarkus](https://quarkus.io/)
