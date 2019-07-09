@@ -238,7 +238,7 @@ spec:
 
   - edit yaml to use ARM version
 
-  - copy to \<K3s\>/manifests in master
+  - copy to K3S_LOCATION/manifests in master
 ```sh
 $ sudo cp kubernetes-dashboard.yaml /var/lib/rancher/k3s/server/manifests/
 
