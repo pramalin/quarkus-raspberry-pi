@@ -1,36 +1,39 @@
 Table of Contents
 =================
 
-         * [Introduction](#introduction)
-            * [Objective](#objective)
+   * [Table of Contents](#table-of-contents)
+      * [Introduction](#introduction)
+         * [Objective](#objective)
          * [Why Raspberry Pi?](#why-raspberry-pi)
-         * [Hardware](#hardware)
+      * [Hardware](#hardware)
          * [Power Supply](#power-supply)
-         * [Software](#software)
-            * [Operating System](#operating-system)
-            * [Networking](#networking)
-            * [JDK](#jdk)
-            * [GrallVM](#grallvm)
-         * [Kubernetes](#kubernetes)
-            * [Installing k3s](#installing-k3s)
+      * [Software](#software)
+         * [Operating System](#operating-system)
+      * [Networking](#networking)
+      * [JDK](#jdk)
+      * [GrallVM](#grallvm)
+      * [Kubernetes](#kubernetes)
+         * [Installing k3s](#installing-k3s)
       * [Dashboards](#dashboards)
+         * [Installation](#installation)
          * [Dashboard Web access](#dashboard-web-access)
       * [Single Node setup](#single-node-setup)
       * [Function as a Service (FaaS)](#function-as-a-service-faas)
-            * [OpenFaas](#openfaas)
-         * [Quarkus](#quarkus)
-            * [Quick start](#quick-start)
-            * [Building docker image](#building-docker-image)
-            * [Deploying to Kubernetes](#deploying-to-kubernetes)
-            * [Deploying to Raspberry Pi](#deploying-to-raspberry-pi)
-         * [Useful Links](#useful-links)
+         * [OpenFaas](#openfaas)
+      * [Quarkus](#quarkus)
+         * [Quick start](#quick-start)
+         * [Building docker image](#building-docker-image)
+         * [Deploying to Kubernetes](#deploying-to-kubernetes)
+         * [Deploying to Raspberry Pi](#deploying-to-raspberry-pi)
+      * [Useful Links](#useful-links)
+
 
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
-### Introduction
+## Introduction
 [Quarkus](https://quarkus.io/) is a new framework that aims to simplify developing Java applications for container platforms (Docker, Kubernetes, OpenShift, etc). Tools like ['Source to Image'](https://developers.redhat.com/blog/2017/02/23/getting-started-with-openshift-java-s2i/) are already available for this purpose, as seen in this this example: [Deploy a Spring Boot Application to OpenShift](https://www.baeldung.com/spring-boot-deploy-openshift). However Quarkus features fast boot time and small memory usage, making it a better java framework for 'Function as a Service' architecture. Where the functions are instantiated on demand, so fast start up time is a desired feature.
 
-#### Objective
+### Objective
 This page documents the instructions followed when setting up Raspberry Pi cluster for Kubernetes and running Quarkus examples. The hardware set up and the Operating System installations are based on [Raspberry Pi Dramble](https://www.pidramble.com/). Please reffer this site for detailed instructions. We picked [k3s](https://k3s.io/), a lightweight Kubernetes distribution, suitable for machines with small memory capacity. 
 
 ### Why Raspberry Pi?
@@ -38,7 +41,7 @@ All major cloud system providers support Kubernetes and there are single node Ku
 
 Raspberry Pi from model 3 onwards use 64 ARM processors but still use 32 bit Linux for backward compatibility with older models. This can be a limiting factor in some environments. However the same instructions documented here can be adapted for more powerful machines like Intel's [NUC](https://www.amazon.com/dp/B07QH8CG9L/ref=sspa_dk_detail_0?psc=1).
 
-### Hardware
+## Hardware
  - Raspberry Pi - 4
  - Micro SD card - 4 
  - 6 inch Ethernet cable - 4
@@ -55,16 +58,16 @@ Raspberry Pi from model 3 onwards use 64 ARM processors but still use 32 bit Lin
   - POE HAT - 4
   - 4 port POE Ethernet Switch - 1
 
-### Software
+## Software
 
-#### Operating System
+### Operating System
 It is sufficient to use the standard Raspbian (32 bit) Linux distribution to run the JVM version of the container images.
 - Flash the OS to SD card
 Follow the [official instructions](https://www.raspberrypi.org/documentation/installation/installing-images/README.md) to install Raspbian lite version. 
 - enable ssh
 Mount the SD card and create a blank file sudo touch /Volumes/boot/ssh
 
-#### Networking
+## Networking
 Networking setup is the most difficult aspect of the cluster setup. Our requirement is to access each nodes in the cluster individually from the bastion and for each node to have internet access.
 
 Typically the local clusters are demonstrated using a dedicated router for the cluster which then connects to the ISP provided router. For simplicity sake, here we'll use the shared network set up on Ubuntu host, wired to the Ethernet switch of the cluster.
@@ -108,19 +111,19 @@ sudo nmcli c modify 'Shared' ipv4.address 10.0.1.1/24
 ```
 This setup will allow us to connect to the individual nodes by IP address and each node will have internet access.
 
-#### JDK
+## JDK
 Then install the standard JDK for ARM 32 (e.g. jdk-8u212-linux-arm32-vfp-hflt).
 ```sh
 $ sudo apt-get install oracle-java8-jdk
 ```
-#### GrallVM
+## GrallVM
 Quarkus support native compilation using GraalVM. However GraalVM distribution is not available for ARM processers yet.
 
 
-### Kubernetes
+## Kubernetes
 We'll use [k3s](https://k3s.io/), a lightweight distribution of Kubernetes targeted for edge devices. This is stripped down version of the official distribution provided by [Rancher Labs](https://rancher.com/). It is interesting to note that there are several certified Kubernetes providers, Google, Amazon, Microsoft, IBM, Red hat, etc.
 
-#### Installing k3s
+### Installing k3s
 On master node:
 - Download k3s install script and install k3s
 ```sh
@@ -171,7 +174,7 @@ Kubernetes is a command line driven system. The cloud system providers like Goog
 
 [Kubernetes Dashboard](https://github.com/kubernetes/dashboard) can be installed in the Raspberry Pi cluster to serve as UI.
 
-***Installation instructions***
+### Installation
 [Link](https://mindmelt.nl/mindmelt.nl/2019/04/08/k3s-kubernetes-dashboard-load-balancer/)
 
 > The following procedures are applied in **master** node.
@@ -265,7 +268,7 @@ spec:
 $ sudo cp kubernetes-dashboard.yaml /var/lib/rancher/k3s/server/manifests/
 ```
 
-***Access dashboard via tunnel to proxy***
+***Setup ssh tunnel to proxy***
 
   -  run kubectl proxy
 ```sh
@@ -311,13 +314,13 @@ Single node ready to run VM instances are available for Kubernetes as [minikube]
 ## Function as a Service (FaaS)
 AWS Lambda popularized the FaaS model
 
-#### OpenFaas
+### OpenFaas
 [OpenFaas](https://www.openfaas.com/) is a simple platform that can wrap functions written in many languages (Java, JavaScript, Python, Go, R, Shell script, Cobol, etc.) into a Function as a Service modules and deploy to Kubernetes. It offers CLI tool to create, build and deploy the functions and simple Web UI to manage the deployed functions. There is a self-paced [workshop](https://github.com/openfaas/workshop) that can help us understand many practical uses of FaaS  architecture.
 
-### Quarkus
+## Quarkus
 [Quarkus](https://quarkus.io/) is a comprehensive Java framework that compiles Java code into container applications suitable for 'Function as a Service' modules to start up quickly and use less resources.
 
-#### Quick start
+### Quick start
 [Link](https://quarkus.io/guides/getting-started-guide)
 ***Prerequsites***
 1. JDK 1.8+ installed with JAVA_HOME configured appropriately
@@ -373,7 +376,7 @@ $ curl http://10.0.1.60:8080/hello/greeting/jaxjug
 hello jaxjug
 ```
 
-#### Building docker image  
+### Building docker image  
 [Link](https://quarkus.io/guides/building-native-image-guide.html)
 ```
 docker build -f src/main/docker/Dockerfile.jvm -t quarkus-quickstart/getting-started .
@@ -383,7 +386,7 @@ Running locally.
 docker run -i --rm -p 8080:8080 quarkus-quickstart/getting-started
 ```
 
-#### Deploying to Kubernetes  
+### Deploying to Kubernetes  
 [Link](https://quarkus.io/guides/kubernetes-guide.html)
 
 ***Prerequisites***
@@ -391,7 +394,7 @@ docker run -i --rm -p 8080:8080 quarkus-quickstart/getting-started
 2. being able to package the docker image
 
 
-#### Deploying to Raspberry Pi
+### Deploying to Raspberry Pi
 By default the container images created by the build system use the JDK for AMD processors as seen in the generated file: src/main/docker/Dockerfile.jvm
 This works for typical VMs on most of the developers machines.
 
@@ -442,7 +445,7 @@ The [run-java.sh](./docs/run-java.sh) file was extracted from the fabric8/java-a
 After changing the Dockerfile and copying the run-java.sh, the build command generates the docker image that can successfully run in Raspberry Pi.
 
 
-### Useful Links
+## Useful Links
 - [Raspberry Pi Dramble](https://www.pidramble.com/)
 - [Will it cluster? k3s on your Raspberry Pi](https://blog.alexellis.io/test-drive-k3s-on-raspberry-pi/)
 - [CNCF Presentations](https://github.com/cncf/presentations/tree/master/kubernetes)
