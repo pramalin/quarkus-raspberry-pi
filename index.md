@@ -37,12 +37,12 @@ Table of Contents
 [Quarkus](https://quarkus.io/) is a new framework that aims to simplify developing Java applications for container platforms (Docker, Kubernetes, OpenShift, etc). Tools like ['Source to Image'](https://developers.redhat.com/blog/2017/02/23/getting-started-with-openshift-java-s2i/) are already available for this purpose, as seen in this this example: [Deploy a Spring Boot Application to OpenShift](https://www.baeldung.com/spring-boot-deploy-openshift). However Quarkus features fast boot time and small memory usage, making it a better java framework for 'Function as a Service' architecture. Where the functions are instantiated on demand, so fast start up time is a desired feature.
 
 ### Objective
-This page documents the instructions followed when setting up Raspberry Pi cluster for Kubernetes and running Quarkus examples. The hardware set up and the Operating System installations are based on [Raspberry Pi Dramble](https://www.pidramble.com/). Please reffer this site for detailed instructions. We picked [k3s](https://k3s.io/), a lightweight Kubernetes distribution, suitable for machines with small memory capacity. 
+This page documents the instructions followed when setting up Raspberry Pi cluster for Kubernetes and running Quarkus examples. The hardware set up and the Operating System installations are based on [Raspberry Pi Dramble](https://www.pidramble.com/). Please refer this site for detailed instructions. We picked [k3s](https://k3s.io/), a lightweight Kubernetes distribution, suitable for machines with small memory capacity. 
 
 ### Why Raspberry Pi?
 All major cloud system providers support Kubernetes and there are single node Kubernetes VM images suitable to run on developers workstation. However setting Kubernetes up on bare metal servers provides better insight into the operation of multi-node cluster system. Raspberry Pi Single Board Computers are less expensive and a four-node cluster setup with them costs about $300. The book [Kubernetes: Up and Running](https://www.amazon.com/_/dp/1491935677?tag=oreilly20-20) also recommends setting up Raspberry Pi cluster.
 
-Raspberry Pi from model 3 onwards use 64 ARM processors but still use 32 bit Linux for backward compatibility with older models. This can be a limiting factor in some environments. However the same instructions documented here can be adapted for more powerful machines like Intel's [NUC](https://www.amazon.com/dp/B07QH8CG9L/ref=sspa_dk_detail_0?psc=1).
+Raspberry Pi from model 3 on wards use 64 ARM processors but still use 32 bit Linux for backward compatibility with older models. This can be a limiting factor in some environments. However the same instructions documented here can be adapted for more powerful machines like Intel's [NUC](https://www.amazon.com/dp/B07QH8CG9L/ref=sspa_dk_detail_0?psc=1).
 
 ## Hardware
  - Raspberry Pi - 4
@@ -137,7 +137,7 @@ password:
 ```
 
 ## GrallVM
-Quarkus support native compilation using GraalVM. However GraalVM distribution is not available for ARM processers yet.
+Quarkus support native compilation using GraalVM. However GraalVM distribution is not available for ARM processors yet.
 
 
 ## Kubernetes
@@ -512,6 +512,7 @@ sudo kubectl get service
 
 ## Useful Links
 - [Raspberry Pi Dramble](https://www.pidramble.com/)
+- [DrupalCon Seattle 2019: Everything I know about Kubernetes I learned from a cluster of Raspberry Pis](https://www.youtube.com/watch?v=yLzO88h40uw)
 - [Will it cluster? k3s on your Raspberry Pi](https://blog.alexellis.io/test-drive-k3s-on-raspberry-pi/)
 - [CNCF Presentations](https://github.com/cncf/presentations/tree/master/kubernetes)
 - [k3s Lightweight Kubernetes](https://k3s.io/)
@@ -521,4 +522,5 @@ sudo kubectl get service
 - [Janakiram](https://www.youtube.com/user/janakirammsv)
 
 - [micronaut](https://micronaut.io/)
+
 
