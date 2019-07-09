@@ -28,13 +28,13 @@ Raspberry Pi from model 3 onwards use 64 ARM processors but still use 32 bit Lin
  - 6 inch Ethernet cable - 4
  
 ### Power Supply
-**Option 1**
+***Option 1***
 - USB Power Source
   - USB Power Hub - 1
   - USB to Micro USB cable - 4
   - 4 port Ethernet Switch - 1
 
-**Option 2**
+***Option 2***
 - Power Over Ethernet
   - POE HAT - 4
   - 4 port POE Ethernet Switch - 1
@@ -55,7 +55,7 @@ Typically the local clusters are demonstrated using a dedicated router for the c
 
 Since we need to login to the individual nodes for administration, it is necessary to assign static IP address to each node. We have used the following IP address for the nodes.
 
-  | **nodes** | **IP address** |
+  | ***nodes*** | ***IP address*** |
   |-----------|------------|
   | master0   | 10.0.1.60  |
   | worker1   | 10.0.1.61  |
@@ -117,6 +117,7 @@ $ sudo cat /var/lib/rancher/k3s/server/node-token
 K1067ab3d6b7def59628e00d8498481adfb796365b5b86949250bc5323ad173d040::node:da4b4dcc2bbc88b25f79c7549d93ce36
 ```
 - create start and stop scripts
+
 file: start-k3s.sh 
 ```sh
 sudo k3s server &
@@ -140,7 +141,7 @@ file: stop-k3s.sh
 ```sh
 sudo systemctl stop k3s
 ```
-- **References**
+- ***References***
     - General Kubernetes [documentation](https://kubernetes.io/docs/home/) is the good place to start learning the concepts. 
     
     - [Google Kubernetes Engine](https://cloud.google.com/kubernetes-engine/docs/) is Google's implementation of Kubernetes on cloud. Their implementation and the Web interface to manage Kubernetes is considered to be the most polished. The documentation has several tutorials for Java examples and offers free credit to test drive their platform.
@@ -154,14 +155,15 @@ Kubernetes is a command line driven system. The cloud system providers like Goog
 
 [Kubernetes Dashboard](https://github.com/kubernetes/dashboard) can be installed in the Raspberry Pi cluster to serve as UI.
 
-**Installation instructions**
+***Installation instructions***
+
 [Link](https://mindmelt.nl/mindmelt.nl/2019/04/08/k3s-kubernetes-dashboard-load-balancer/)
 
-- **In master**
+- ***In master***
    - setup access control
 [Creating Sample user](https://github.com/kubernetes/dashboard/wiki/Creating-sample-user)
 
-**Create yaml files**
+***Create yaml files***
 
 file: dashboard-adminuser.yaml
 ```yaml
@@ -187,12 +189,12 @@ subjects:
   namespace: kube-system
 ```
 
-**Apply yaml files**
+***Apply yaml files***
 ```sh
 $ kubectl apply -f dashboard-adminuser.yaml
 $ kubectl apply -f adminuser-rbac.yaml
 ```
-**Install dashboard**
+***Install dashboard***
    - download dashboard yaml
 ```sh
 curl -sfL https://raw.githubusercontent.com/kubernetes/dashboard/v1.10.1/src/deploy/recommended/kubernetes-dashboard.yaml > kubernetes-dashboard.yaml
@@ -205,7 +207,7 @@ $ sudo cp kubernetes-dashboard.yaml /var/lib/rancher/k3s/server/manifests/
 
 ```
 
-**Access dashboard via tunnel to proxy**
+***Access dashboard via tunnel to proxy***
   -  run kubectl proxy
 ```sh
 $ kubectl proxy
@@ -213,6 +215,8 @@ $ kubectl proxy
 - Get  admin token:
 ```sh
 $ kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep admin-user | awk '{print $1}')
+
+
 Name:         admin-user-token-tmtlz
 Namespace:    kube-system
 Labels:       <none>
@@ -222,12 +226,12 @@ Annotations:  kubernetes.io/service-account.name: admin-user
 Type:  kubernetes.io/service-account-token
 
 Data
-====
+=.=.=.=
 ca.crt:     1062 bytes
 namespace:  11 bytes
 token:      eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJhZG1pbi11c2VyLXRva2VuLXRtdGx6Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImFkbWluLXVzZXIiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiI3MWFmOTE1Yi05OWUzLTExZTktYjdlMy1iODI3ZWJhZjEyOWUiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZS1zeXN0ZW06YWRtaW4tdXNlciJ9.XCaJ8lrvxqAoEJ21yuk_538DHrMaDrigfQjVQ3ttIzdymmknf_9PaCkLNmHdqL4kIbuDMI1ts8ayeQZy5M426K0Tn3fbcbcLbqzQ7VP4zhNoOUlnD41STIlcedHcwOBQCSrP5s_AXwR4hpij9HkaLxlJ-JymhxZlmOHhzpmjHZ2551hJeBaBkfVhaDOZnRjUCzs3rTnMsjSdcYGtpBgom1jgLaK49VpBgbTmyxu5FB5AWNTapn8nRpX9j3tAhQGjD9-YCmnjAIUtLXAz9albMtFcFqh9pEpSshbae1CznuO9TOUwucV5rJvbiDf0x_7pr3Wl7duCjsH7gVxJwNKL8g
 ```
-- **in bastion**
+- ***in bastion***
     - start ssh tunnel
 ```sh 
     ssh -L8001:localhost:8001 pi@10.0.1.60
@@ -251,11 +255,11 @@ AWS Lambda popularized the FaaS model
 
 #### Quick start
 [Link](https://quarkus.io/guides/getting-started-guide)
-**Prerequsites**
+***Prerequsites***
 1. JDK 1.8+ installed with JAVA_HOME configured appropriately
 2. Apache Maven 3.5.3+
 
-**Bootstrapping the project**
+***Bootstrapping the project***
 ```sh
 $ mvn io.quarkus:quarkus-maven-plugin:0.18.0:create \
     -DprojectGroupId=org.acme \
@@ -272,7 +276,7 @@ It generates:
 - example Dockerfile files for both native and jvm modes
 - the application configuration file
 
-**Running the sample program**
+***Running the sample program***
 ```sh
 $ ./mvnw compile quarkus:dev
 ```
@@ -297,7 +301,7 @@ Listening for transport dt_socket at address: 5005
 2019-07-07 17:30:15,546 INFO  [io.quarkus] (main) Quarkus 0.17.0 started in 11.381s. Listening on: http://[::]:8080
 2019-07-07 17:30:15,588 INFO  [io.quarkus] (main) Installed features: [cdi, resteasy]
 ```
-**Test quarkus web app**
+***Test quarkus web app***
 ```sh
 $ curl http://10.0.1.60:8080/hello
 hello
@@ -318,7 +322,7 @@ docker run -i --rm -p 8080:8080 quarkus-quickstart/getting-started
 #### Deploying to Kubernetes  
 [Link](https://quarkus.io/guides/kubernetes-guide.html)
 
-**Prerequisites**
+***Prerequisites***
 1. having access to a Kubernetes and/or OpenShift cluster. Minikube and Minishift are valid options.
 2. being able to package the docker image
 
