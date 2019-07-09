@@ -1,7 +1,7 @@
   
         Inhabited at some places, deserted at others, 
         depressed at some places, raised at others;
-        wherever your (women and) men are good,
+        wherever your men are good,
         Blessed land, you are good too.
 
         நாடா கொன்றோ காடா கொன்றோ
@@ -9,8 +9,7 @@
         எவ்வழி நல்லவ ராடவர்
         அவ்வழி நல்லை வாழிய நிலனே.
         Puranaanooru – 187
-        
-        
+                
 [Old Tamil Poetry](https://oldtamilpoetry.com/2016/11/24/puranaanooru-187/)
 
 Table of Contents
@@ -348,7 +347,7 @@ token:      eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2V
 Single node ready to run VM instances are available for Kubernetes as [minikube](https://kubernetes.io/docs/setup/learning-environment/minikube/) and for OpenShift as [minishift](https://github.com/minishift/minishift).  Which are useful to explore these platforms easily without setting up a cluster. 
 
 ## Function as a Service (FaaS)
-[AWS Lambda] (https://aws.amazon.com/lambda/) popularized the FaaS model and the recent addition is [Google Cloud Functions](https://cloud.google.com/functions/).
+[AWS Lambda](https://aws.amazon.com/lambda/) popularized the FaaS model and the recent addition is [Google Cloud Functions](https://cloud.google.com/functions/).
 
 ### OpenFaas
 [OpenFaas](https://www.openfaas.com/) is a simple platform that can wrap functions written in many languages (Java, JavaScript, Python, Go, R, Shell script, Cobol, etc.) into a Function as a Service modules and deploy to Kubernetes. It offers CLI tool to create, build and deploy the functions and simple Web UI to manage the deployed functions. There is a self-paced [workshop](https://github.com/openfaas/workshop) that can help us understand many practical uses of FaaS  architecture.
